@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ $(uname -s) == "CYGWIN_NT"* ]]
+then
+    docker run --rm -it -p 3000:3000 -v $(pwd | xargs cygpath -w):/app -w /app node:local "$@"
+else
+    docker run --rm -it -p 3000:3000 -v $(pwd):/app -w /app node:local "$@"
+fi

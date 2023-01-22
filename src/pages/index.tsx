@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { Inter } from "@next/font/google";
 import { useState } from "react";
-import { getLocalStorage, setLocalStorage } from "@/utils/localStorage";
+import { getLocalStorage, setLocalStorage } from "utils/localStorage";
 import * as short from "short-uuid";
 
 const inter = Inter({ subsets: ["latin"] });

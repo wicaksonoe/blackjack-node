@@ -1,15 +1,13 @@
-import BaseError from "@/interfaces/baseError";
-import RoomInformation from "@/interfaces/roomInformation";
-import { Redis } from "ioredis";
-import moment from "moment";
+import BaseError from "interfaces/baseError";
+import RoomInformation from "interfaces/roomInformation";
+import CreateRoom from "services/createRoom";
 import type { NextApiRequest, NextApiResponse } from "next";
-import * as Short from "short-uuid";
 
 interface CreateRoomRequest {
   name: string;
 }
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RoomInformation | BaseError>
 ) {
@@ -20,24 +18,7 @@ export default function handler(
       return res.status(400).send({ message: "Field name is required." });
     }
 
-    // TODO: move initialization redis to utils
-    const redis = new Redis(
-      `${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
-    );
-
-    const expireTime = moment().utc().add(2, "hours");
-
-    const roomId = Short.generate();
-    const roomInformation: RoomInformation = {
-      id: roomId,
-      name: body.name,
-      url: `${process.env.BASE_URL}/room/${roomId}`,
-      expireTime: expireTime.unix(),
-      players: [],
-    };
-
-    redis.hset(`room:${roomId}`, roomInformation);
-    redis.expireat(`room:${roomId}`, expireTime.unix());
+    const roomInformation = await CreateRoom(body);
 
     res.status(200).json(roomInformation);
   } else {
